@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 매칭 점수
+ */
 public class Test04 {
     public static void main(String[] args) {
 /*        String word = "blind";
