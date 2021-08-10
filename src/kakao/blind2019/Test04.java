@@ -93,16 +93,17 @@ public class Test04 {
     }
 
     public static void setLinkName(String page, int index) {
-        String linkName;
-        String[] textList = page.split("<head>");
-        textList = textList[1].split("</head>");
-        String head = textList[0];
+        String head = getHead(page);
+        int mid = 0, posl = 0, posr = 0;
+        while (mid <= posl) {
+            posl = head.indexOf("<meta", posl + 1);
+            posr = head.indexOf(">", posl);
+            mid = head.lastIndexOf("https://", posr);
+        }
 
-        int cnt = head.indexOf("content=\"");
-        head = head.substring(cnt).replaceAll("content=\"", "");
-        cnt = head.indexOf("\"/>");
-        linkName = head.substring(0, cnt);
-        linkNameMap.put(linkName, index);
+        posr = head.indexOf("\"", mid);
+        String url = head.substring(mid, posr);
+        linkNameMap.put(url, index);
     }
 
     // 기본 점수 얻기
@@ -119,6 +120,14 @@ public class Test04 {
             }
         }
         return basicScore;
+    }
+
+    public static String getHead(String page) {
+        int startIndex = page.indexOf("<head>");
+        int lastIndex = page.indexOf("</head>");
+
+        String head = page.substring(startIndex + "<head>".length(), lastIndex);
+        return head;
     }
 
     public static String getBody(String page) {
