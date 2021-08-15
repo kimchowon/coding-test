@@ -1,0 +1,70 @@
+package kakao.blind2020;
+
+public class Test01 {
+    public static void main(String[] args) {
+        int[][] key = {{0, 0, 0}, {1, 0, 0}, {0, 1, 1}};
+        int[][] lock = {{1, 1, 1}, {1, 1, 0}, {1, 0, 1}};
+
+        System.out.println(solution(key, lock));
+    }
+
+    public static int[][] place;
+
+    public static boolean solution(int[][] key, int[][] lock) {
+        int N = lock.length + (2 * (key.length - 1));
+        place = new int[N][N];
+
+        for (int i = 0; i <= N - key.length; i++) {
+            for (int j = 0; j <= N - key.length; j++) {
+
+                for (int k = 0; k < 4; k++) { // 0: 90도 1: 180도 2: 270도 3: 360도
+                    place = new int[N][N];
+                    initPlace(key.length - 1, lock);
+                    rotateKey(i, j, key, k);
+
+                    boolean check = checkPlace(key.length - 1, lock);
+                    if (check) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static boolean checkPlace(int index, int[][] lock) {
+        for (int i = 0; i < lock.length; i++) {
+            for (int j = 0; j < lock[i].length; j++) {
+                if (place[index + i][index + j] != 1) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static void rotateKey(int x, int y, int[][] key, int k) {
+        for (int i = 0; i < key.length; i++) {
+            for (int j = 0; j < key[i].length; j++) {
+                if (k == 0) { // 90도
+                    place[x + i][y + j] += key[i][j];
+                } else if (k == 1) { // 180도
+                    place[x + i][y + j] += key[key.length - j - 1][i];
+                } else if (k == 2) { // 270도
+                    place[x + i][y + j] += key[key.length - i - 1][key.length - j - 1];
+                } else if (k == 3) { // 360도
+                    place[x + i][y + j] += key[j][key.length - i - 1];
+                }
+            }
+        }
+    }
+
+    private static void initPlace(int index, int[][] lock) {
+        for (int i = 0; i < lock.length; i++) {
+            for (int j = 0; j < lock[i].length; j++) {
+                place[index + i][index + j] = lock[i][j];
+            }
+        }
+    }
+}

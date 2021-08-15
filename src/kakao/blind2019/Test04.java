@@ -94,15 +94,10 @@ public class Test04 {
 
     public static void setLinkName(String page, int index) {
         String head = getHead(page);
-        int mid = 0, posl = 0, posr = 0;
-        while (mid <= posl) {
-            posl = head.indexOf("<meta", posl + 1);
-            posr = head.indexOf(">", posl);
-            mid = head.lastIndexOf("https://", posr);
-        }
-
-        posr = head.indexOf("\"", mid);
-        String url = head.substring(mid, posr);
+        String metaText = "<meta property=\"og:url\" content=\"";
+        int startIndex = head.indexOf(metaText) + metaText.length();
+        int lastIndex = head.indexOf("\"", startIndex);
+        String url = head.substring(startIndex, lastIndex);
         linkNameMap.put(url, index);
     }
 
@@ -125,7 +120,6 @@ public class Test04 {
     public static String getHead(String page) {
         int startIndex = page.indexOf("<head>");
         int lastIndex = page.indexOf("</head>");
-
         String head = page.substring(startIndex + "<head>".length(), lastIndex);
         return head;
     }
