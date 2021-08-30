@@ -1,7 +1,10 @@
-package kakao.blind2021;
+package kakao.blind2021.level3;
 
 import java.util.Arrays;
 
+/**
+ *
+ */
 public class Test01 {
     public static void main(String[] args) {
 
