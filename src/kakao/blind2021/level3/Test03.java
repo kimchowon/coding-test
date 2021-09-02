@@ -7,6 +7,10 @@ import java.util.*;
  */
 public class Test03 {
     public static void main(String[] args) {
+/*        int[][] board = {{1, 0, 0, 3}, {2, 0, 0, 0}, {0, 0, 0, 2}, {3, 0, 1, 0}};
+        int r = 1;
+        int c = 0;*/
+
         int[][] board = {{3, 0, 0, 2}, {0, 0, 1, 0}, {0, 1, 0, 0}, {2, 0, 0, 3}};
         int r = 0;
         int c = 1;
@@ -21,10 +25,6 @@ public class Test03 {
         int y;
         int count;
 
-        public Card() {
-
-        }
-
         public Card(int value, int x, int y, int count) {
             this.value = value;
             this.x = x;
@@ -37,14 +37,10 @@ public class Test03 {
             this.y = y;
             this.count = count;
         }
-
-        public String toString() {
-            return "[" + x + ", " + y + "]";
-        }
     }
 
     public static List<Card> cardList;
-    public static int[][] BOARD;
+    public static int[][] BOARD = new int[4][4];
     public static int ANSWER = Integer.MAX_VALUE;
     public static int R;
     public static int C;
@@ -52,7 +48,7 @@ public class Test03 {
     public static int solution(int[][] board, int r, int c) {
         int answer = 0;
 
-        BOARD = board;
+        init(board);
         R = r;
         C = c;
         cardList = new ArrayList<>();
@@ -78,30 +74,32 @@ public class Test03 {
         }
 
         Card[] bucket = new Card[item.length];
-        permutation(item, bucket, bucket.length);
+        permutation(item, bucket, bucket.length, board);
 
-        return ANSWER;
+        return ANSWER + cardList.size();
     }
 
-    public static void permutation(Card[] items, Card[] bucket, int k) {
+
+    public static int order = 0;
+
+    public static void permutation(Card[] items, Card[] bucket, int k, int[][] board) {
         if (k == 0) {
             int total = 0;
             Card initCursor = new Card(R, C, 0);
-
-            // 커서부터 첫번째 위치까지 가는 최단 경로
-            total += getNearestPath(initCursor, bucket[0]);
-            System.out.println(initCursor + " ~ " + bucket[0].toString() + " = " + total);
+            Card start = bucket[0];
+            total += getNearestPath(initCursor, start);
+            BOARD[start.x][start.y] = 0;
 
             for (int i = 0; i < bucket.length - 1; i++) {
-                int nearestPath = getNearestPath(bucket[i], bucket[i + 1]);
-                System.out.println(bucket[i].toString() + " ~ " + bucket[i + 1].toString() + " = " + nearestPath);
-
+                start = bucket[i];
+                Card end = bucket[i + 1];
+                int nearestPath = getNearestPath(start, end);
+                BOARD[start.x][start.y] = 0;
+                BOARD[end.x][end.y] = 0;
                 total += nearestPath;
-
             }
-            System.out.println("total = " + total);
-            System.out.println();
-            System.out.println();
+            ANSWER = Math.min(ANSWER, total);
+            init(board);
             return;
         }
 
@@ -109,7 +107,7 @@ public class Test03 {
         for (int i = 0; i < items.length; i++) {
             if (bucket.length == k) {
                 bucket[0] = items[i];
-                permutation(items, bucket, k - 1);
+                permutation(items, bucket, k - 1, board);
             } else {
                 // 이번에 넣을 인덱스가 짝수번째이면
                 if ((lastIndex + 1) % 2 == 0) {
@@ -123,30 +121,32 @@ public class Test03 {
 
                     if (!isSame) {
                         bucket[lastIndex + 1] = items[i];
-                        permutation(items, bucket, k - 1);
+                        permutation(items, bucket, k - 1, board);
                     }
                 } else { // 이번에 넣을 인덱스가 홀수번째이면
                     if (bucket[lastIndex].value == -items[i].value) {
                         bucket[lastIndex + 1] = items[i];
-                        permutation(items, bucket, k - 1);
+                        permutation(items, bucket, k - 1, board);
                     }
                 }
             }
         }
     }
 
-    public static int[] moveX = {0, 0, -1, +1};
-    public static int[] moveY = {+1, -1, 0, 0};
-
+    public static int[] moveX = {-1, +1, 0, 0};
+    public static int[] moveY = {0, 0, -1, +1};
     public static int getNearestPath(Card start, Card end) {
         boolean[][] visited = new boolean[4][4];
         Queue<Card> queue = new LinkedList<>();
         queue.add(start);
-        visited[start.x][start.y] = true;
         int count = 0;
 
         while (!queue.isEmpty()) {
             Card cur = queue.poll();
+
+            if (BOARD[cur.x][cur.y] > 0) {
+                visited[cur.x][cur.y] = true;
+            }
 
             if (cur.x == end.x && cur.y == end.y) {
                 count = cur.count;
@@ -160,7 +160,6 @@ public class Test03 {
 
                 if (validationCheckCoordinate(x, y)) {
                     if (!visited[x][y]) {
-                        visited[x][y] = true;
                         queue.add(new Card(x, y, cur.count + 1));
                     }
                 }
@@ -173,7 +172,6 @@ public class Test03 {
                 int y = nearestCard.y;
                 if (validationCheckCoordinate(x, y)) {
                     if (!visited[x][y]) {
-                        visited[x][y] = true;
                         queue.add(new Card(x, y, cur.count + 1));
                     }
                 }
@@ -191,25 +189,19 @@ public class Test03 {
             x += moveX;
             y += moveY;
 
-            if (!validationCheckCoordinate(x,y)) {
+            if (!validationCheckCoordinate(x, y)) {
                 break;
+            } else {
+                nearestCard.x = x;
+                nearestCard.y = y;
             }
 
             if (BOARD[x][y] > 0) {
-                nearestCard.x = x;
-                nearestCard.y = y;
-                break;
+                return nearestCard;
             }
         }
 
         return nearestCard;
-    }
-
-    public static boolean validationCheckEndBoard(int x, int y) {
-        if (x == 0 || x == 3 || y == 0 || y == 3) {
-            return true;
-        }
-        return false;
     }
 
     public static boolean validationCheckCoordinate(int x, int y) {
@@ -217,5 +209,13 @@ public class Test03 {
             return false;
         }
         return true;
+    }
+
+    public static void init(int[][] board) {
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                BOARD[i][j] = board[i][j];
+            }
+        }
     }
 }
