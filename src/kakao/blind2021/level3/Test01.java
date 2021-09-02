@@ -3,7 +3,7 @@ package kakao.blind2021.level3;
 import java.util.Arrays;
 
 /**
- *
+ * 택시 합승 요금
  */
 public class Test01 {
     public static void main(String[] args) {
