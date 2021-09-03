@@ -40,26 +40,27 @@ public class Test02 {
             }
         }
 
+        // map안의 점수 list들을 정렬
         for (String key : scoreMap.keySet()) {
             List<Integer> scoreList = scoreMap.get(key);
             Collections.sort(scoreList);
             scoreMap.put(key, scoreList);
         }
 
-        for (int m = 0; m < query.length; m++) {
-            String[] q = query[m].replaceAll(" and ", " ").split(" ");
+        for (int i = 0; i < query.length; i++) {
+            String[] q = query[i].replaceAll(" and ", " ").split(" ");
             String key = q[0] + q[1] + q[2] + q[3];
             int score = Integer.parseInt(q[4]);
 
             if (!scoreMap.containsKey(key)) {
-                answer[m] = 0;
+                answer[i] = 0;
                 continue;
             }
 
             List<Integer> scores = scoreMap.get(key);
             int index = searchBinary(scores, score);
             int count = scores.size() - index;
-            answer[m] = count;
+            answer[i] = count;
         }
         return answer;
     }
