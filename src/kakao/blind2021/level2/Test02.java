@@ -13,81 +13,72 @@ public class Test02 {
         // java and backend and junior and pizza 100
     }
 
-    static class Information {
-        String language;
-        String job;
-        String career;
-        String food;
-        int score;
-
-        public Information(String language, String job, String career, String food, int score) {
-            this.language = language;
-            this.job = job;
-            this.career = career;
-            this.food = food;
-            this.score = score;
-        }
-    }
-
     public static int[] solution(String[] info, String[] query) {
         int[] answer = new int[query.length];
 
-        List<Information> informationList = getInfoList(info); // 지원자 리스트
-        informationList.sort(Comparator.comparingInt(o -> o.score)); // 점수 순으로 정렬
+        // 1.map 만들기
+        Map<String, List<Integer>> scoreMap = new HashMap<>();
+        for (int m = 0; m < info.length; m++) {
+            String[] infoStrings = info[m].split(" ");
+            String language[] = {"-", infoStrings[0]};
+            String job[] = {"-", infoStrings[1]};
+            String career[] = {"-", infoStrings[2]};
+            String food[] = {"-", infoStrings[3]};
+            int score = Integer.parseInt(infoStrings[4]);
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    for (int k = 0; k < 2; k++) {
+                        for (int l = 0; l < 2; l++) {
+                            String key = language[i] + job[j] + career[k] + food[l];
 
-        List<Information> queryList = getInfoList(query);  // 질문 리스트
-
-        for (int i=0; i < queryList.size(); i++) {
-            Information q = queryList.get(i);
-
-            int index = 0;
-            for (int j=index; j < informationList.size(); j++) {
-                if (informationList.get(j).score >= q.score) {
-                    index = j;
-                    break;
+                            List<Integer> scoreList = new ArrayList<>();
+                            if (scoreMap.containsKey(key)) {
+                                scoreList = scoreMap.get(key);
+                            }
+                            scoreList.add(score);
+                            scoreMap.put(key, scoreList);
+                        }
+                    }
                 }
             }
+        }
 
-            int count = 0;
-            for (int k=index; k < informationList.size(); k++) {
-                Information information = informationList.get(k);
+        for (String key : scoreMap.keySet()) {
+            List<Integer> scoreList = scoreMap.get(key);
+            Collections.sort(scoreList);
+            scoreMap.put(key, scoreList);
+        }
 
-                if (information.score < q.score) {
-                    continue;
-                }
-                if (!information.language.equals(q.language) && !q.language.equals("-")) {
-                    continue;
-                }
-                if (!information.job.equals(q.job) && !q.job.equals("-")) {
-                    continue;
-                }
-                if (!information.career.equals(q.career) && !q.career.equals("-")) {
-                    continue;
-                }
-                if (!information.food.equals(q.food) && !q.food.equals("-")) {
-                    continue;
-                }
-                count++;
+        for (int m = 0; m < query.length; m++) {
+            String[] q = query[m].replaceAll(" and ", " ").split(" ");
+            String key = q[0] + q[1] + q[2] + q[3];
+            int score = Integer.parseInt(q[4]);
+
+            if (!scoreMap.containsKey(key)) {
+                answer[m] = 0;
+                continue;
             }
-            answer[i] = count;
+
+            List<Integer> scores = scoreMap.get(key);
+            int index = searchBinary(scores, score);
+            int count = scores.size() - index;
+            answer[m] = count;
         }
         return answer;
     }
 
-    public static List<Information> getInfoList(String[] info) {
-        List<Information> informationList = new ArrayList<>();
+    public static int searchBinary(List<Integer> scores, int score) {
+        int start = 0;
+        int end = scores.size();
 
-        for (String i : info) {
-            String[] strings = i.replaceAll(" and ", " ").split(" ");
-            String language = strings[0];
-            String job = strings[1];
-            String career = strings[2];
-            String food = strings[3];
-            int score = Integer.parseInt(strings[4]);
-
-            Information information = new Information(language, job, career, food, score);
-            informationList.add(information);
+        while (start < end) {
+            int mid = (start + end) / 2;
+            if (scores.get(mid) >= score) {
+                end = mid;
+            }else {
+                start = mid + 1;
+            }
         }
-        return  informationList;
+        return start;
     }
 }
