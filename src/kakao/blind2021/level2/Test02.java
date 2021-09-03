@@ -8,9 +8,6 @@ public class Test02 {
         String[] query = {"java and backend and junior and pizza 100", "python and frontend and senior and chicken 200", "cpp and - and senior and pizza 250", "- and backend and senior and - 150", "- and - and - and chicken 100", "- and - and - and - 150"};
         int[] answer = solution(info, query);
         System.out.println(Arrays.toString(answer));
-
-        // * [조건]을 만족하는 사람 중 코딩테스트 점수를 X점 이상 받은 사람은 모두 몇 명인가?
-        // java and backend and junior and pizza 100
     }
 
     public static int[] solution(String[] info, String[] query) {
@@ -75,7 +72,7 @@ public class Test02 {
             int mid = (start + end) / 2;
             if (scores.get(mid) >= score) {
                 end = mid;
-            }else {
+            } else {
                 start = mid + 1;
             }
         }
