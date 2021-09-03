@@ -40,13 +40,14 @@ public class Test02 {
             }
         }
 
-        // map안의 점수 list들을 정렬
+        // 2.map안의 점수 list들을 정렬
         for (String key : scoreMap.keySet()) {
             List<Integer> scoreList = scoreMap.get(key);
             Collections.sort(scoreList);
             scoreMap.put(key, scoreList);
         }
 
+        // 3.query마다 해당하는 개수 찾기
         for (int i = 0; i < query.length; i++) {
             String[] q = query[i].replaceAll(" and ", " ").split(" ");
             String key = q[0] + q[1] + q[2] + q[3];
